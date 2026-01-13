@@ -1,6 +1,6 @@
 # Still learning new things
 
-taskList = []
+taskList = {}
 fileName = "tugas.txt"
 
 def get_data() :
@@ -13,21 +13,27 @@ def get_data() :
         f = open(fileName, "w")
     else :    
         for task in f.readlines() :
-            taskList.append(task.replace("\n", ""))
+            # taskList.append(task.replace("\n", ""))
+            x = task.split(" || ")
+            x[1].replace("\n", "")
+            intx = int(x[1])
+            boolx = bool(intx)
+            taskList[x[0]] = boolx
         f.close()
 
 def add_task() :
     inputTask = input("Add new task : ")
     write_data(inputTask)
-    taskList.append(inputTask)
+    # taskList.append(inputTask)
+    taskList[inputTask] = False
     print("[System] New task added")
 
 def write_data(inputTask) :
     with open(fileName, "a") as f :
         if len(taskList) == 0 :
-            f.write(f"{inputTask}")
+            f.write(f"{inputTask} || 0")
         else : 
-            f.write(f"\n{inputTask}")
+            f.write(f"\n{inputTask} || 0")
     f.close()
 
 def show_tasks() :
@@ -36,7 +42,11 @@ def show_tasks() :
     else :
         print("=============================")
         for i, task in enumerate(taskList) :
-            print(f"{i + 1}. {task}")
+            print(f"{i + 1}. {task} ", end='')
+            if taskList[task] == False :
+                print("[ ]")
+            else :
+                print("[v]")
         print("=============================")
         
 def delete_task() :
@@ -44,35 +54,69 @@ def delete_task() :
         try :
             show_tasks()
             indx = int(input("Enter the task index : "))
-            delete_process(indx) 
+            print(type(indx))
+            delete_process(indx)
         except IndexError : 
             print("Out of range")
-        except :
-            print("Input must be a number")
+        # except :
+        #     print("Input must be a number")
         else : 
             break
 
 def delete_process(indx) :
     while True :
-        print(f"{indx}. {taskList[indx - 1]}")
-        usrinput = input("Confirm : [Y/n]")
-        if usrinput == "Y" or usrinput == "y" :
-            taskList.pop(indx - 1)
-            push_newdata()
-            print(f"Delete successfull")
-            return
-        elif usrinput.lower() == "n" :
-            print("Canceling...")
-            return
-        else : print("the answer should be just y or n")  
+        for i, key in enumerate(taskList) :
+            if (indx - 1) == i :
+                print(f"{indx}. {(key)} {taskList[key]}")
+                usrinput = input("Confirm : [Y/n]")
+                if usrinput == "Y" or usrinput == "y" :
+                    taskList.pop(key)
+                    push_newdata()
+                    print(f"Delete successfull")
+                    return
+                elif usrinput.lower() == "n" :
+                    print("Canceling...")
+                    return
+                else : print("the answer should be just y or n") 
+            else :
+                continue
     
 def push_newdata() :
     f = open(fileName, "w")
-    for i, task in enumerate(taskList) :
+    for i, key in enumerate(taskList) :
+        task = f"{key} || "
+        if taskList[key] == False :
+            task = task + "0"
+        else :
+            task = task + "1"
         if i == 0 :
-            f.write(task)
+            f.write(f"{task}")
         else :
             f.write(f"\n{task}")
+
+def status_task() :
+    if len(taskList) == 0 :
+        print("There's no task yet ...")
+    else :
+        print("=============================")
+        for i, task in enumerate(taskList) :
+            if taskList[task] == True : 
+                continue
+            print(f"{i + 1}. {task} ", end='')
+            if taskList[task] == False :
+                print("[ ]")
+            else :
+                print("[v]")
+        print("=============================")
+    try :
+        inputStatus = int(input("Enter task index : "))
+        for i, key in enumerate(taskList) : 
+            if (inputStatus - 1) == i :
+                taskList[key] = True
+            else : continue
+    except :
+        print("Input must be a number")
+    
     
             
 def main() :
@@ -81,7 +125,7 @@ def main() :
     while True :
         try :
             print("========== MENU ==========")
-            print("1. add new task\n2. show tasks list\n3. Delete task\n0. Exit")
+            print("1. add new task\n2. show tasks list\n3. Delete task\n4. Change task status\n0. Exit")
             inputMenu = int(input("Input : ")) 
         except :
             print("Input cannot be null and should be integer type!")
@@ -89,6 +133,7 @@ def main() :
             if inputMenu == 1 : add_task()
             elif inputMenu == 2 : show_tasks() 
             elif inputMenu == 3 : delete_task()
+            elif inputMenu == 4 : status_task()
             elif inputMenu == 0 : return False
             else : print("Menu unregistered")
 
